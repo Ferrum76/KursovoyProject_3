@@ -158,4 +158,39 @@ def test_string_to_date():
     assert utils.string_to_date("04:27:37.904916") is None
     assert utils.string_to_date("T04:27:37.904916") is None
     assert utils.string_to_date("") is None
+    assert utils.string_to_date("2018-08-19") == datetime.date(2018, 8, 19)
+    assert utils.string_to_date("2018-08-19T") == datetime.date(2018, 8, 19)
+    assert utils.string_to_date("2018-08-19T04:27") == datetime.date(2018, 8, 19)
 
+
+@pytest.fixture
+def sample_data():
+    return [
+        {"date": "2024-02-20", "value": 10},
+        {"date": "2024-02-21", "value": 15},
+        {"date": "2024-02-22", "value": 20},
+        {"date": "2024-02-23", "value": 25},
+        {"date": "2024-02-24", "value": 30},
+        {"date": "2024-02-25", "value": 35},
+        {"date": "2024-02-26", "value": 40},
+    ]
+
+def test_get_last_five_data(sample_data):
+    expected_result = [
+        {"date": "2024-02-26", "value": 40},
+        {"date": "2024-02-25", "value": 35},
+        {"date": "2024-02-24", "value": 30},
+        {"date": "2024-02-23", "value": 25},
+        {"date": "2024-02-22", "value": 20},
+    ]
+
+    result = utils.get_last_five_data(sample_data)
+    assert result == expected_result
+    assert utils.get_last_five_data([]) == []
+
+
+def test_parse_date():
+    assert utils.parse_date("2018-08-19T04:27:37.904916") == '19.08.2018'
+    assert utils.parse_date("04:27:37.904916") == ""
+    assert utils.parse_date("T04:27:37.904916") == ""
+    assert utils.parse_date("") == ""
