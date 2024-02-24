@@ -140,20 +140,22 @@ def make_amount(transaction: dict) -> str:
 
     return result_str
 
+
 def show_balance(transaction: dict) -> str:
     # Преобразование даты транзакции
     date = parse_date(transaction.get("date"))
-    
+
     # Получение и форматирование описания транзакции
-    description = transaction.get("description", "Описание транзакции отсутствует")
-    
+    description = transaction.get(
+        "description", "Описание транзакции отсутствует")
+
     # Форматирование информации об отправителе и получателе
     transaction_info = make_adr(transaction)
-    
+
     # Форматирование суммы перевода и валюты
     amount = make_amount(transaction)
-    
+
     # Сборка итоговой строки
     result = f"{date} {description}\n{transaction_info}\n{amount}"
-    
+
     return result
