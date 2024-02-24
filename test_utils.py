@@ -245,3 +245,57 @@ def test_make_adr():
     expected_result = "Счет **6952 -> Счет **6702"
     assert utils.make_adr(
         transaction) == expected_result, "Should format transaction with account numbers only correctly"
+
+
+def test_make_amount():
+    transaction_info = {
+        "operationAmount": {
+            "amount": "31957.58",
+            "currency": {
+                "name": "руб.",
+                "code": "RUB"
+            }
+        }
+    }
+    assert utils.make_amount(transaction_info) == "31957.58 руб.", "Should format amount and currency correctly"
+
+    transaction_info = {
+        "operationAmount": {
+            "amount": "100.00",
+            "currency": {
+                "name": "USD",
+                "code": "USD"
+            }
+        }
+    }
+    assert utils.make_amount(transaction_info) == "100.00 USD", "Should handle float amount correctly"
+
+    transaction_info = {
+        "operationAmount": {
+            "amount": "1000000",
+            "currency": {
+                "name": "EUR",
+                "code": "EUR"
+            }
+        }
+    }
+    assert utils.make_amount(transaction_info) == "1000000 EUR", "Should handle large numbers correctly"
+
+    transaction_info = {
+        "operationAmount": {
+            "currency": {
+                "name": "JPY",
+                "code": "JPY"
+            }
+        }
+    }
+    with pytest.raises(KeyError):
+        utils.make_amount(transaction_info)
+
+    transaction_info = {
+        "operationAmount": {
+            "amount": "500",
+        }
+    }
+    with pytest.raises(KeyError):
+        utils.make_amount(transaction_info)

@@ -141,3 +141,13 @@ def make_adr(transaction: dict) -> str:
     res = f"{from_info} -> {to_info}"
 
     return res
+
+
+def make_amount(bank_info: dict) -> str:
+    amount_info = bank_info["operationAmount"]
+    money_amount = amount_info["amount"]
+    money_currency = amount_info["currency"]['name']
+
+    result_str = f"{money_amount} {money_currency}"
+
+    return result_str
