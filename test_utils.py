@@ -154,13 +154,17 @@ def test_filter_data():
 
 
 def test_string_to_date():
-    assert utils.string_to_date("2018-08-19T04:27:37.904916") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
+    assert utils.string_to_date(
+        "2018-08-19T04:27:37.904916") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
     assert utils.string_to_date("04:27:37.904916") is None, "Should be None"
     assert utils.string_to_date("T04:27:37.904916") is None, "Should be None"
     assert utils.string_to_date("") is None, "Should be None"
-    assert utils.string_to_date("2018-08-19") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
-    assert utils.string_to_date("2018-08-19T") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
-    assert utils.string_to_date("2018-08-19T04:27") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
+    assert utils.string_to_date(
+        "2018-08-19") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
+    assert utils.string_to_date(
+        "2018-08-19T") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
+    assert utils.string_to_date(
+        "2018-08-19T04:27") == datetime.date(2018, 8, 19), "Should be 2018-08-19"
 
 
 @pytest.fixture
@@ -175,6 +179,7 @@ def sample_data():
         {"date": "2024-02-26", "value": 40},
     ]
 
+
 def test_get_last_five_data(sample_data):
     expected_result = [
         {"date": "2024-02-26", "value": 40},
@@ -186,21 +191,29 @@ def test_get_last_five_data(sample_data):
 
     result = utils.get_last_five_data(sample_data)
     assert result == expected_result, "Should return last five data correctly"
-    assert utils.get_last_five_data([]) == [], "Should return empty list for empty input"
+    assert utils.get_last_five_data(
+        []) == [], "Should return empty list for empty input"
 
 
 def test_parse_date():
-    assert utils.parse_date("2018-08-19T04:27:37.904916") == '19.08.2018', "Should parse date correctly"
-    assert utils.parse_date("04:27:37.904916") == "", "Should return empty string for invalid input"
-    assert utils.parse_date("T04:27:37.904916") == "", "Should return empty string for invalid input"
-    assert utils.parse_date("") == "", "Should return empty string for empty input"
+    assert utils.parse_date(
+        "2018-08-19T04:27:37.904916") == '19.08.2018', "Should parse date correctly"
+    assert utils.parse_date(
+        "04:27:37.904916") == "", "Should return empty string for invalid input"
+    assert utils.parse_date(
+        "T04:27:37.904916") == "", "Should return empty string for invalid input"
+    assert utils.parse_date(
+        "") == "", "Should return empty string for empty input"
 
 
 def test_format_bank_info_regular():
-    assert utils.format_bank_info("Bank of Example 1234567812345678") == "Bank of Example 1234 56** **** 5678", "Should handle regular bank names correctly"
-    assert utils.format_bank_info("Счет Bank of Example 1234567812345678") == "Счет **5678", "Should handle account numbers correctly"
-    assert utils.format_bank_info("1234567812345678") == " 1234 56** **** 5678", "Should handle regular numbers correctly"
-    
+    assert utils.format_bank_info(
+        "Bank of Example 1234567812345678") == "Bank of Example 1234 56** **** 5678", "Should handle regular bank names correctly"
+    assert utils.format_bank_info(
+        "Счет Bank of Example 1234567812345678") == "Счет **5678", "Should handle account numbers correctly"
+    assert utils.format_bank_info(
+        "1234567812345678") == " 1234 56** **** 5678", "Should handle regular numbers correctly"
+
 
 def test_make_adr():
     transaction = {
@@ -208,23 +221,27 @@ def test_make_adr():
         "to": "Счет 64686473678894779589"
     }
     expected_result = "Maestro 1596 83** **** 5199 -> Счет **9589"
-    assert utils.make_adr(transaction) == expected_result, "Should format the transaction with full info correctly"
+    assert utils.make_adr(
+        transaction) == expected_result, "Should format the transaction with full info correctly"
 
     transaction = {
         "to": "Счет 64686473678894779589"
     }
     expected_result = "Счет отправителя неизвестен -> Счет **9589"
-    assert utils.make_adr(transaction) == expected_result, "Should handle missing from info correctly"
+    assert utils.make_adr(
+        transaction) == expected_result, "Should handle missing from info correctly"
 
     transaction = {
         "from": "Maestro 1596837868705199"
     }
     expected_result = "Maestro 1596 83** **** 5199 -> Счет получателя неизвестен"
-    assert utils.make_adr(transaction) == expected_result, "Should handle missing to info correctly"
+    assert utils.make_adr(
+        transaction) == expected_result, "Should handle missing to info correctly"
 
     transaction = {
         "from": "Счет 75106830613657916952",
         "to": "Счет 11776614605963066702"
     }
     expected_result = "Счет **6952 -> Счет **6702"
-    assert utils.make_adr(transaction) == expected_result, "Should format transaction with account numbers only correctly"
+    assert utils.make_adr(
+        transaction) == expected_result, "Should format transaction with account numbers only correctly"
