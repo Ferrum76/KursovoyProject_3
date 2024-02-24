@@ -9,7 +9,7 @@ def get_data_from_json(filename: str) -> list[dict]:
     :param filename: путь до файла
     :return: список словарей
     """
-    if type(filename) is not str:
+    if not isinstance(filename, str):
         return []
 
     file = io.open(filename, encoding='utf-8')
@@ -73,7 +73,9 @@ def string_to_date(date_str: str) -> date | None:
 
 
 def get_last_five_data(data: list[dict]) -> list[dict]:
-    last_data = sorted(data, key=lambda x: string_to_date(x["date"]), reverse=True)
+    last_data = sorted(
+        data, key=lambda x: string_to_date(
+            x["date"]), reverse=True)
 
     return last_data[:5]
 
@@ -111,18 +113,20 @@ def format_bank_info(bank_info: str) -> str:
     parts = bank_info.split()
     bank_digits = parts[-1]
     bank_name = " ".join(parts[:-1])
-    
+
     if "Счет" in bank_name:
         return f"Счет **{bank_digits[-4:]}"
     else:
-        return f"{bank_name} {bank_digits[0:4]} {bank_digits[4:6]}** **** {bank_digits[-4:]}"
+        return f"{bank_name} {bank_digits[0:4]} {
+            bank_digits[4:6]}** **** {bank_digits[-4:]}"
+
 
 def make_adr(transaction: dict) -> str:
     # Инициализируем переменные для хранения информации
     from_info = transaction.get('from', 'default')
     to_info = transaction.get('to', 'default')
 
-    # Форматируем информацию о счетах    
+    # Форматируем информацию о счетах
     if from_info != 'default' and from_info != '':
         from_info = format_bank_info(from_info)
     else:
