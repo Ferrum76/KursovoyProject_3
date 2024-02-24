@@ -1,5 +1,5 @@
 import pytest
-import utils
+from utils import utils
 import datetime
 
 
@@ -204,6 +204,8 @@ def test_parse_date():
         "T04:27:37.904916") == "", "Should return empty string for invalid input"
     assert utils.parse_date(
         "") == "", "Should return empty string for empty input"
+    assert utils.parse_date(
+        "2019-07-12T20:41:47.882230") == '12.07.2019', "Should parse date correctly"
 
 
 def test_format_bank_info_regular():
@@ -257,7 +259,8 @@ def test_make_amount():
             }
         }
     }
-    assert utils.make_amount(transaction_info) == "31957.58 руб.", "Should format amount and currency correctly"
+    assert utils.make_amount(
+        transaction_info) == "31957.58 руб.", "Should format amount and currency correctly"
 
     transaction_info = {
         "operationAmount": {
@@ -268,7 +271,8 @@ def test_make_amount():
             }
         }
     }
-    assert utils.make_amount(transaction_info) == "100.00 USD", "Should handle float amount correctly"
+    assert utils.make_amount(
+        transaction_info) == "100.00 USD", "Should handle float amount correctly"
 
     transaction_info = {
         "operationAmount": {
@@ -279,7 +283,8 @@ def test_make_amount():
             }
         }
     }
-    assert utils.make_amount(transaction_info) == "1000000 EUR", "Should handle large numbers correctly"
+    assert utils.make_amount(
+        transaction_info) == "1000000 EUR", "Should handle large numbers correctly"
 
     transaction_info = {
         "operationAmount": {
@@ -299,3 +304,49 @@ def test_make_amount():
     }
     with pytest.raises(KeyError):
         utils.make_amount(transaction_info)
+
+
+def test_show_balance():
+    test_transaction = {
+        "id": 615064591,
+        "state": "EXECUTED",
+        "date": "2018-10-14T08:21:33.419441",
+        "operationAmount": {
+            "amount": "77751.04",
+            "currency": {
+                "name": "руб.",
+                "code": "RUB"
+            }
+        },
+        "description": "Перевод с карты на счет",
+        "from": "Maestro 3928549031574026",
+        "to": "Счет 84163357546688983493"
+    }
+
+    expected_result = """14.10.2018 Перевод с карты на счет
+Maestro 3928 54** **** 4026 -> Счет **3493
+77751.04 руб."""
+
+    assert utils.show_balance(test_transaction) == expected_result
+
+    test_transaction = {
+        "id": 522357576,
+        "state": "EXECUTED",
+        "date": "2019-07-12T20:41:47.882230",
+        "operationAmount": {
+            "amount": "51463.70",
+            "currency": {
+                "name": "USD",
+                "code": "USD"
+            }
+        },
+        "description": "Перевод организации",
+        "from": "Счет 48894435694657014368",
+        "to": "Счет 38976430693692818358"
+    }
+
+    expected_result = """12.07.2019 Перевод организации
+Счет **4368 -> Счет **8358
+51463.70 USD"""
+
+    assert utils.show_balance(test_transaction) == expected_result

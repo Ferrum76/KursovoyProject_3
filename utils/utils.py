@@ -13,13 +13,13 @@ def get_data_from_json(filename: str) -> list[dict]:
         return []
 
     file = io.open(filename, encoding='utf-8')
-    data = json.load(file)
+    transactions = json.load(file)
     file.close()
 
-    return data
+    return transactions
 
 
-def filter_data(operations_data: list[dict]) -> list[dict]:
+def filter_data(transactions: list[dict]) -> list[dict]:
     """
     Эта функция фильтрует основной массив и возвращает массив выполненных операций
     :param operations_data: массив объектов операций
@@ -27,17 +27,17 @@ def filter_data(operations_data: list[dict]) -> list[dict]:
     """
 
     # Если входной массив пуст, возвращаем пустой массив
-    if len(operations_data) == 0:
+    if len(transactions) == 0:
         return []
 
     # Создаем пустой массив для результатов
     res = []
 
     # Проходим по всем объектам во входном массиве
-    for data in operations_data:
+    for transaction in transactions:
         # Если состояние объекта равно 'EXECUTED', добавляем его в результаты
-        if data.get('state') == 'EXECUTED':
-            res.append(data)
+        if transaction.get('state') == 'EXECUTED':
+            res.append(transaction)
 
     # Возвращаем массив выполненных операций
     return res
@@ -72,9 +72,9 @@ def string_to_date(date_str: str) -> date | None:
     return iso_date
 
 
-def get_last_five_data(data: list[dict]) -> list[dict]:
+def get_last_five_data(transaction: list[dict]) -> list[dict]:
     last_data = sorted(
-        data, key=lambda x: string_to_date(
+        transaction, key=lambda x: string_to_date(
             x["date"]), reverse=True)
 
     return last_data[:5]
@@ -86,23 +86,11 @@ def parse_date(date_str: str) -> str:
     :param date_str: входная строка с датой.
     :return: дату в формате 'дд.мм.гггг' или пустую строку, если входная строка не может быть обработана.
     """
-    # Если входная строка пуста, возвращаем пустую строку
-    if date_str == "":
-        return ""
+    # Пытаемся преобразовать дату в формат iso
+    iso_date = string_to_date(date_str)
 
-    # Разделяем входную строку на две части: дату и время
-    sd = date_str.split("T")
-    # Если дата отсутствует или входная строка пуста, возвращаем пустую строку
-    if sd[0] == '' or len(sd) == 0:
-        return ""
-
-    # Получаем дату операции
-    date_of_oper = sd[0]
-    try:
-        # Пытаемся преобразовать строку с датой в объект даты
-        iso_date = date.fromisoformat(date_of_oper)
-    except ValueError:
-        # Если преобразование не удалось, возвращаем пустую строку
+    # Если преобразование не удалось, возвращаем пустую строку
+    if iso_date is None:
         return ""
 
     # Возвращаем дату в формате 'дд.мм.гггг'
@@ -143,11 +131,29 @@ def make_adr(transaction: dict) -> str:
     return res
 
 
-def make_amount(bank_info: dict) -> str:
-    amount_info = bank_info["operationAmount"]
+def make_amount(transaction: dict) -> str:
+    amount_info = transaction["operationAmount"]
     money_amount = amount_info["amount"]
     money_currency = amount_info["currency"]['name']
 
     result_str = f"{money_amount} {money_currency}"
 
     return result_str
+
+def show_balance(transaction: dict) -> str:
+    # Преобразование даты транзакции
+    date = parse_date(transaction.get("date"))
+    
+    # Получение и форматирование описания транзакции
+    description = transaction.get("description", "Описание транзакции отсутствует")
+    
+    # Форматирование информации об отправителе и получателе
+    transaction_info = make_adr(transaction)
+    
+    # Форматирование суммы перевода и валюты
+    amount = make_amount(transaction)
+    
+    # Сборка итоговой строки
+    result = f"{date} {description}\n{transaction_info}\n{amount}"
+    
+    return result
