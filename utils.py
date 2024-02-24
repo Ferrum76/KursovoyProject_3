@@ -57,3 +57,7 @@ def string_to_date(date_str: str) -> object:
     return iso_date
 
 
+def get_last_five_data(data: list[dict]) -> list[dict]:
+    last_data = sorted(data, key=lambda x: string_to_date(x["date"]), reverse=True)
+
+    return last_data[:5]
