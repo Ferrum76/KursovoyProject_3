@@ -1,5 +1,6 @@
 import pytest
 import utils
+import datetime
 
 
 @pytest.fixture
@@ -150,3 +151,11 @@ def test_filter_data():
 
     fd = utils.filter_data(mock_data_5)
     assert len(fd) == 0
+
+
+def test_string_to_date():
+    assert utils.string_to_date("2018-08-19T04:27:37.904916") == datetime.date(2018, 8, 19)
+    assert utils.string_to_date("04:27:37.904916") is None
+    assert utils.string_to_date("T04:27:37.904916") is None
+    assert utils.string_to_date("") is None
+

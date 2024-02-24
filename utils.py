@@ -1,5 +1,6 @@
 import json
 import io
+from datetime import date
 
 
 def get_data_from_json(filename: str) -> list[dict]:
@@ -32,3 +33,27 @@ def filter_data(operations_data: list[dict]) -> list[dict]:
             res.append(data)
 
     return res
+
+
+def string_to_date(date_str: str) -> object:
+    """
+    Эта функция фарматирует строку в объект даты в формате iso
+    :param date_str: date_str
+    :return: дату в формате iso
+    """
+    if date_str == "":
+        return None
+    sd = date_str.split("T")
+    print(sd)
+    if sd[0] == '' or len(sd) == 0:
+        return None
+
+    date_of_oper = sd[0]
+    try:
+        iso_date = date.fromisoformat(date_of_oper)
+    except ValueError:
+        return None
+
+    return iso_date
+
+
